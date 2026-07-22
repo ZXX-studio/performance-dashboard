@@ -80,24 +80,16 @@ export const usePerformanceStore = create<PerformanceStore>()(
   }))
 );
 
-// 计算属性 - 使用 memoization
-let _cachedFilteredData: PerformanceRecord[] | null = null;
-let _cachedFiltersKey = '';
+// ===== 计算函数 - 纯函数，从 store 读取状态 =====
 
 export function getFilteredData(): PerformanceRecord[] {
   const { rawData, filters } = usePerformanceStore.getState();
-  const key = JSON.stringify(filters);
-  if (_cachedFilteredData && _cachedFiltersKey === key) return _cachedFilteredData;
-
   let result = [...rawData];
   if (filters.periodType !== '全部') result = result.filter(r => r.periodType === filters.periodType);
   if (filters.year !== '全部') result = result.filter(r => r.year === filters.year);
   if (filters.periodNumber !== '全部') result = result.filter(r => r.periodNumber === filters.periodNumber);
   if (filters.departments.length > 0) result = result.filter(r => filters.departments.includes(r.department));
   if (filters.grades.length > 0) result = result.filter(r => filters.grades.includes(r.grade));
-
-  _cachedFilteredData = result;
-  _cachedFiltersKey = key;
   return result;
 }
 
